@@ -27,8 +27,8 @@ var authServer = {
  * Add the client information in here
  */
 var client = {
-	"client_id": "",
-	"client_secret": "",
+	"client_id": "oauth-client-1",
+	"client_secret": "oauth-client-secret-1",
 	"redirect_uris": ["http://localhost:9000/callback"]
 };
 
@@ -48,15 +48,30 @@ app.get('/authorize', function(req, res){
 	/*
 	 * Send the user to the authorization server
 	 */
-	
+  var authorizeUrl = buildUrl(authServer.authorizationEndpoint, {
+    response_type: 'code',
+    client_id: client.client_id,
+    redirect_uri: client.redirect_uris[0]
+  });
+
+  res.redirect(authorizeUrl);
 });
 
 app.get('/callback', function(req, res){
-
 	/*
 	 * Parse the response from the authorization server and get a token
 	 */
-	
+	var code = req.query.code;
+  var form_data = qs.stringyfy({
+    grant_type: 'authorization_code',
+    code: code,
+    redirect_uri: client.redirect_uris[0]
+  });
+  var headers = {
+    'Content-Type': 'application/x-www-form-urlencoded',
+    'Authorization': 'Basic ' + encodeClientCredentials(client.client_id, client.client_secret)
+  };
+
 });
 
 app.get('/fetch_resource', function(req, res) {
